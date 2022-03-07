@@ -1,25 +1,77 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { signInWithPopup } from 'firebase/auth';
+import { createContext, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Home } from './pages/Home';
+import { NewRoom } from "./pages/NewRoom";
+import { auth, provider } from './services/firebase';
+
+type UserType = {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+type AuthContextType = {
+  user: UserType | undefined;
+  signInWithGoogle: ()=> Promise<void>;
+}
+
+
+
+export const AuthContext = createContext({} as AuthContextType)
 
 function App() {
+
+  const [user, setUser] = useState<UserType>()
+
+  // function signInWithGoogle() {
+  //   signInWithPopup(auth, provider)
+  //     .then((result) => {
+  //       if (result.user) {
+  //         const {displayName, photoURL, uid} = result.user
+
+  //         if (!displayName || !photoURL) {
+  //           throw new Error('Missing information from Google Account')
+  //         }
+
+  //         setUser({
+  //           id: uid,
+  //           name: displayName,
+  //           avatar: photoURL,
+  //         })
+  //       }
+  //     })
+  // }
+
+    async function signInWithGoogle() {
+      
+      const result = await signInWithPopup(auth, provider)
+          if (result.user) {
+            const {displayName, photoURL, uid} = result.user
+
+            if (!displayName || !photoURL) {
+              throw new Error('Missing information from Google Account')
+            }
+
+            setUser({
+              id: uid,
+              name: displayName,
+              avatar: photoURL,
+            })
+          }
+      
+  }
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+    <AuthContext.Provider value={{user, signInWithGoogle}}>
+      <Routes>
+        <Route path='/' element={<Home/>} />
+        <Route path='/rooms/new' element={<NewRoom />} />
+      </Routes> 
+      </AuthContext.Provider>
+    </BrowserRouter>
   );
 }
 
