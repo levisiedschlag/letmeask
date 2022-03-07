@@ -1,76 +1,18 @@
-import { signInWithPopup } from 'firebase/auth';
-import { createContext, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home';
 import { NewRoom } from "./pages/NewRoom";
-import { auth, provider } from './services/firebase';
-
-type UserType = {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
-type AuthContextType = {
-  user: UserType | undefined;
-  signInWithGoogle: ()=> Promise<void>;
-}
-
-
-
-export const AuthContext = createContext({} as AuthContextType)
+import {AuthContextProvider} from './contexts/AuthContext'
 
 function App() {
-
-  const [user, setUser] = useState<UserType>()
-
-  // function signInWithGoogle() {
-  //   signInWithPopup(auth, provider)
-  //     .then((result) => {
-  //       if (result.user) {
-  //         const {displayName, photoURL, uid} = result.user
-
-  //         if (!displayName || !photoURL) {
-  //           throw new Error('Missing information from Google Account')
-  //         }
-
-  //         setUser({
-  //           id: uid,
-  //           name: displayName,
-  //           avatar: photoURL,
-  //         })
-  //       }
-  //     })
-  // }
-
-    async function signInWithGoogle() {
-      
-      const result = await signInWithPopup(auth, provider)
-          if (result.user) {
-            const {displayName, photoURL, uid} = result.user
-
-            if (!displayName || !photoURL) {
-              throw new Error('Missing information from Google Account')
-            }
-
-            setUser({
-              id: uid,
-              name: displayName,
-              avatar: photoURL,
-            })
-          }
-      
-  }
-
   
   return (
     <BrowserRouter>
-    <AuthContext.Provider value={{user, signInWithGoogle}}>
-      <Routes>
-        <Route path='/' element={<Home/>} />
-        <Route path='/rooms/new' element={<NewRoom />} />
-      </Routes> 
-      </AuthContext.Provider>
+      <AuthContextProvider>
+        <Routes>
+          <Route path='/' element={<Home/>} />
+          <Route path='/rooms/new' element={<NewRoom />} />
+        </Routes> 
+      </AuthContextProvider>
     </BrowserRouter>
   );
 }

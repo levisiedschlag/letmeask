@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useContext } from 'react'
-import { AuthContext } from '../App'
+import { AuthContext } from '../contexts/AuthContext'
 
 import ilustrationImg from '../assets/images/illustration.svg'
 import logoImg from '../assets/images/logo.svg'
@@ -23,7 +23,6 @@ export function NewRoom() {
         <main>
           <div className='main-content'>
             <img src={logoImg} alt="letmeask" />
-            <h1>{user?.name}</h1>
             <h2>Criar nova sala</h2>
             
             <form>
